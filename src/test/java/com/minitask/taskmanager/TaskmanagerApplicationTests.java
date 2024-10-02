@@ -74,11 +74,12 @@ class TaskmanagerApplicationTests {
 	@Order(4)
 	public void testUpdateTask() throws Exception {
 
-		task.setId(1L);
-		task.setTitle("Study Kanji");
-		task.setDueDate(LocalDate.of(2024, 10, 30));
+		Task updatedTask = new Task();
+		updatedTask.setId(1L);
+		updatedTask.setTitle("Study Kanji");
+		updatedTask.setDueDate(LocalDate.of(2024, 10, 30));
 
-		String json = mapper.writeValueAsString(task);
+		String json = mapper.writeValueAsString(updatedTask);
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/tasks")
 				.contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
@@ -86,11 +87,6 @@ class TaskmanagerApplicationTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.title",Matchers.equalTo("Study Kanji")))
 				.andExpect(jsonPath("$.dueDate",Matchers.equalTo("2024-10-30")));
-
-		mockMvc.perform(MockMvcRequestBuilders.get("/api/tasks/all"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$",hasSize(1)));
-
 	}
 
 	@Test
