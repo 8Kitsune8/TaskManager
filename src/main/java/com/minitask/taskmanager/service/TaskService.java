@@ -3,6 +3,8 @@ package com.minitask.taskmanager.service;
 import com.minitask.taskmanager.model.Task;
 import com.minitask.taskmanager.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,11 +32,7 @@ public class TaskService {
         return taskRepository.findById(id);
     }
 
-   /* @Query(
-            value = "SELECT * FROM Tasks ORDER BY id",
-            countQuery = "SELECT count(*) FROM Tasks",
-            nativeQuery = true)
-    Page<Task> findAllUsersWithPagination(Pageable pageable){
-         return taskRepository.findAll(pageable);
-    }*/
+    public Page<Task> getAllTasksPageable(Pageable pageable){
+         return taskRepository.findAllUsersWithPagination(pageable);
+    }
 }
