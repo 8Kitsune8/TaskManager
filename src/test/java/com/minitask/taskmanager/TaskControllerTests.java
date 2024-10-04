@@ -101,4 +101,17 @@ class TaskControllerTests {
 		String result = requestResult.getResponse().getContentAsString();
 		assertEquals("Task is deleted",result);
 	}
+
+	@Test
+	@Order(6)
+	public void testGetAllPagedAndSorted() throws Exception{
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/tasks/allPagAndSort")
+						.param("sort","id,desc"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.content[0].id",Matchers.equalTo(3)))
+				.andExpect(jsonPath("$.content[0].title").value("autoTask 3"))
+				.andExpect(jsonPath("$.content[0].description").value("c desc"));
+
+	}
 }

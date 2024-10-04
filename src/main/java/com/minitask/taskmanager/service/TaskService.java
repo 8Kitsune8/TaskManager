@@ -32,7 +32,11 @@ public class TaskService {
         return taskRepository.findById(id);
     }
 
-    public Page<Task> getAllTasksPageable(Pageable pageable){
+    public Page<Task> getAllTasksPageableQuery(Pageable pageable){
          return taskRepository.findAllUsersWithPagination(pageable);
+    }
+
+    public Page<Task> getAllTasksPageableAndSort(Pageable pageable){
+        return taskRepository.findAll(pageable);
     }
 }

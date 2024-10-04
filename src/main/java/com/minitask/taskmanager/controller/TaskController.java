@@ -2,6 +2,8 @@ package com.minitask.taskmanager.controller;
 
 import com.minitask.taskmanager.model.Task;
 import com.minitask.taskmanager.service.TaskService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,16 +29,21 @@ public class TaskController {
 
     @GetMapping("/allPageable")
     public Page<Task> getAllTasksPageable(@PageableDefault(value = 2, page = 0) Pageable pageable) {
-        return taskService.getAllTasksPageable(pageable);
+        return taskService.getAllTasksPageableQuery(pageable);
+    }
+
+    @GetMapping("/allPagAndSort")
+    public Page<Task> getAllTaskDefPag(Pageable pageable){
+        return taskService.getAllTasksPageableAndSort(pageable);
     }
 
     @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable(name = "id") Long id){
+    public Task getTaskById(@PathVariable(name = "id") @Positive Long id){
         Optional<Task> task = taskService.getTaskById(id);
         return task.orElseGet(Task::new);
     }
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task){
+    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task){
         return new ResponseEntity<>(taskService.updateOrInsertTask(task), HttpStatus.CREATED);
     }
     @PutMapping
