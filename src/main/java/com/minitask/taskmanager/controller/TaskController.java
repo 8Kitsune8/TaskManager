@@ -1,5 +1,6 @@
 package com.minitask.taskmanager.controller;
 
+import com.minitask.taskmanager.exception.BadTaskFormatException;
 import com.minitask.taskmanager.model.Task;
 import com.minitask.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,7 +45,10 @@ public class TaskController {
         return task.orElseGet(Task::new);
     }
     @PostMapping
-    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task){
+    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task, Errors errors){
+        if (errors.hasErrors()) {
+            return new ResponseEntity(new BadTaskFormatException(errors), HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(taskService.updateOrInsertTask(task), HttpStatus.CREATED);
     }
     @PutMapping

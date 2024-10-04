@@ -19,7 +19,7 @@ public class Task {
     private Long id;
     @NotNull
     private String title;
-    @NotEmpty
+    @NotEmpty(message = "cannot be empty u lazy one")
     private String description;
     private LocalDate dueDate;
     private boolean completed;

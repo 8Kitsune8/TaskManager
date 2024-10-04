@@ -62,7 +62,7 @@ class TaskControllerTests {
 
 	@Test
 	@Order(3)
-	public void testGetTaskById() throws Exception{//TODO create record before tests with config
+	public void testGetTaskById() throws Exception{
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/tasks/{id}","1")
 				.contentType("application/json"))
