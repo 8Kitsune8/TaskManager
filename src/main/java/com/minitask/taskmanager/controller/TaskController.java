@@ -52,8 +52,11 @@ public class TaskController {
         return new ResponseEntity<>(taskService.updateOrInsertTask(task), HttpStatus.CREATED);
     }
     @PutMapping
-    public Task updateTask(@RequestBody Task task){
-        return taskService.updateOrInsertTask(task);
+    public ResponseEntity<Task> updateTask(@Valid @RequestBody Task task, Errors errors){
+        if (errors.hasErrors()) {
+            return new ResponseEntity(new BadTaskFormatException(errors), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(taskService.updateOrInsertTask(task), HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping

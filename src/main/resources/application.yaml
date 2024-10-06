@@ -11,5 +11,7 @@ spring:
     username: sa
     password: password
     driverClassName: org.h2.Driver
-
+jakarta:
+  validation:
+    notEmptyMessage: "cannot be empty u lazy one"
 

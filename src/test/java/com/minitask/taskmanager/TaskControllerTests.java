@@ -2,6 +2,7 @@ package com.minitask.taskmanager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.minitask.taskmanager.config.Messages;
 import com.minitask.taskmanager.model.Task;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Order;
@@ -19,8 +20,7 @@ import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -33,64 +33,93 @@ class TaskControllerTests {
 	private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 	Task task = new Task();
 
-	@Test
-	void contextLoads() {
-	}
 
 	@Test
 	@Order(1)
 	public void testGetAllTasks() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/tasks/all"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$",hasSize(0)));
+				.andExpect(jsonPath("$",hasSize(3)));
+	}
+
+	@Test
+	public void testInsertTaskWithoutTitleFail() throws Exception {
+
+		task.setTitle("Study Kanji");
+		task.setId(4L);
+		String json = mapper.writeValueAsString(task);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/tasks").contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+						.content(json).accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest())
+				.andExpect(content().string(Matchers.containsString("cannot be null")));
 	}
 
 	@Test
 	@Order(2)
-	public void testInsertTask() throws Exception {
+	public void testInsertTaskOk() throws Exception {
 
 		task.setTitle("Study Kanji");
-		task.setId(1L);
+		//task.setId(4L);
+		task.setTitle("Study Kanji");
+		task.setDescription("lets go");
 		String json = mapper.writeValueAsString(task);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/tasks").contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
-				.content(json).accept(MediaType.APPLICATION_JSON))
+						.content(json).accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id", Matchers.equalTo(1)))
-				.andExpect(jsonPath("$.title", Matchers.equalTo("Study Kanji")));
+				.andExpect(jsonPath("$.id", Matchers.equalTo(4)))
+				.andExpect(jsonPath("$.title", Matchers.equalTo("Study Kanji")))
+				.andExpect(jsonPath("$.description", Matchers.equalTo("lets go")));
 	}
 
 	@Test
-	@Order(3)
 	public void testGetTaskById() throws Exception{
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/api/tasks/{id}","1")
-				.contentType("application/json"))
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/tasks/{id}","2")
+						.contentType("application/json"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.title",Matchers.equalTo("Study Kanji"))).andReturn();
+				.andExpect(jsonPath("$.title",Matchers.equalTo("autoTask 2"))).andReturn();
 	}
 
 	@Test
-	@Order(4)
-	public void testUpdateTask() throws Exception {
-
+	public void testUpdateTaskNoDescriptionReturnsException() throws Exception {
 		Task updatedTask = new Task();
-		updatedTask.setId(1L);
+		updatedTask.setId(4L);
 		updatedTask.setTitle("Study Kanji");
 		updatedTask.setDueDate(LocalDate.of(2024, 10, 30));
 
 		String json = mapper.writeValueAsString(updatedTask);
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/tasks")
-				.contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+						.contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
 						.content(json))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.title",Matchers.equalTo("Study Kanji")))
+				.andExpect(status().isBadRequest())
+				.andExpect(content().string(Matchers.containsString(Messages.ERROR_NOT_EMPTY)));
+
+	}
+	@Test
+	public void testUpdateTaskOK() throws Exception {
+
+		Task updatedTask = new Task();
+		updatedTask.setId(1L);
+		updatedTask.setTitle("autoTask 1");
+		updatedTask.setDescription("first 200");
+		updatedTask.setDueDate(LocalDate.of(2024, 10, 30));
+
+		String json = mapper.writeValueAsString(updatedTask);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/api/tasks")
+						.contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+						.content(json))
+				.andExpect(status().isAccepted())
+				.andExpect(jsonPath("$.title",Matchers.equalTo("autoTask 1")))
+				.andExpect(jsonPath("$.description",Matchers.equalTo("first 200")))
 				.andExpect(jsonPath("$.dueDate",Matchers.equalTo("2024-10-30")));
 	}
 
 	@Test
-	@Order(5)
+	@Order(3)
 	public void testDeteleTask() throws Exception{
 		String json = mapper.writeValueAsString(task);
 		MvcResult requestResult = mockMvc.perform(MockMvcRequestBuilders.delete("/api/tasks").contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
@@ -103,7 +132,7 @@ class TaskControllerTests {
 	}
 
 	@Test
-	@Order(6)
+	@Order(4)
 	public void testGetAllPagedAndSorted() throws Exception{
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/tasks/allPagAndSort")

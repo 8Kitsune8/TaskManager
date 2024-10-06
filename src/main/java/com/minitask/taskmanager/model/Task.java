@@ -1,9 +1,7 @@
 package com.minitask.taskmanager.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.minitask.taskmanager.config.Messages;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -15,11 +13,12 @@ import java.time.LocalDate;
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "task_id_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "task_id_seq", sequenceName = "task_id_seq", allocationSize = 1)
     private Long id;
     @NotNull
     private String title;
-    @NotEmpty(message = "cannot be empty u lazy one")
+    @NotEmpty(message = Messages.ERROR_NOT_EMPTY)
     private String description;
     private LocalDate dueDate;
     private boolean completed;
