@@ -1,4 +1,4 @@
-package com.minitask.taskmanager;
+package com.minitask.taskmanager.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class TaskControllerTests {
+class TaskControllerTest {
 
 	@Autowired
 	MockMvc mockMvc;
