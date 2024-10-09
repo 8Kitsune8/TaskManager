@@ -37,6 +37,8 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-config:6.3.3'
 // https://mvnrepository.com/artifact/org.springframework.security/spring-security-core
 	implementation 'org.springframework.security:spring-security-core:6.3.3'
+// https://mvnrepository.com/artifact/org.springframework.security/spring-security-test
+	testImplementation 'org.springframework.security:spring-security-test:6.3.3'
 
 
 

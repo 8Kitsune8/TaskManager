@@ -4,12 +4,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -38,8 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
         authorizationManagerRequestMatcherRegistry.requestMatchers(HttpMethod.DELETE).hasRole("ADMIN")
                // .requestMatchers("/api/**").hasAnyRole("ADMIN")
-                .requestMatchers("/api/tasks/**").permitAll()//.hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/tasks/{id}").permitAll()
+                .requestMatchers("/api/tasks/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(SWAGGER_WHITELIST).permitAll()
                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
@@ -47,26 +46,44 @@ public class SecurityConfig {
         return  http.build();
     }
 
- /*
+   @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
-    public UserDetailsService userDetailsService(BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AuthenticationManager authenticationManager(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
+
+        return  new ProviderManager(authenticationProvider);
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+
         manager.createUser(User.withUsername("user")
-                .password(bCryptPasswordEncoder.encode("userPass"))
+                .password(encoder().encode("userPass"))
                 .roles("USER")
                 .build());
+
         manager.createUser(User.withUsername("admin")
-                .password(bCryptPasswordEncoder.encode("adminPass"))
+                .password("adminPass")
                 .roles("USER", "ADMIN")
                 .build());
         return manager;
     }
 
+/*
 
-      @Bean
-    public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
+
+
+
+
 
   @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder bCryptPasswordEncoder, UserDetailsService userDetailsService)

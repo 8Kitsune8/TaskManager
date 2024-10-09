@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -34,6 +35,7 @@ class TaskControllerTest {
 	Task task = new Task();
 
 
+	@WithMockUser(roles="USER")
 	@Test
 	@Order(1)
 	public void testGetAllTasks() throws Exception {
@@ -41,7 +43,7 @@ class TaskControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$",hasSize(3)));
 	}
-
+	@WithMockUser(roles="USER")
 	@Test
 	public void testInsertTaskWithoutTitleFail() throws Exception {
 
@@ -55,6 +57,7 @@ class TaskControllerTest {
 				.andExpect(content().string(Matchers.containsString("cannot be null")));
 	}
 
+	@WithMockUser(roles="USER")
 	@Test
 	@Order(2)
 	public void testInsertTaskOk() throws Exception {
@@ -73,6 +76,7 @@ class TaskControllerTest {
 				.andExpect(jsonPath("$.description", Matchers.equalTo("lets go")));
 	}
 
+	@WithMockUser(roles="USER")
 	@Test
 	public void testGetTaskById() throws Exception{
 
@@ -82,6 +86,7 @@ class TaskControllerTest {
 				.andExpect(jsonPath("$.title",Matchers.equalTo("autoTask 2"))).andReturn();
 	}
 
+	@WithMockUser(roles="USER")
 	@Test
 	public void testUpdateTaskNoDescriptionReturnsException() throws Exception {
 		Task updatedTask = new Task();
@@ -98,6 +103,8 @@ class TaskControllerTest {
 				.andExpect(content().string(Matchers.containsString(Messages.ERROR_NOT_EMPTY)));
 
 	}
+
+	@WithMockUser(roles="USER")
 	@Test
 	public void testUpdateTaskOK() throws Exception {
 
@@ -118,9 +125,22 @@ class TaskControllerTest {
 				.andExpect(jsonPath("$.dueDate",Matchers.equalTo("2024-10-30")));
 	}
 
+
 	@Test
 	@Order(3)
-	public void testDeteleTask() throws Exception{
+	public void testDeteleTaskNoRoleFails() throws Exception{
+		String json = mapper.writeValueAsString(task);
+		mockMvc.perform(MockMvcRequestBuilders.delete("/api/tasks").contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+						.content(json))
+				.andExpect(status().isUnauthorized())
+				.andExpect(content().string(""))
+				.andReturn();
+	}
+
+	@WithMockUser(username="ADMIN", roles="ADMIN")
+	@Test
+	@Order(4)
+	public void testDeteleTaskWithRoleOK() throws Exception{
 		String json = mapper.writeValueAsString(task);
 		MvcResult requestResult = mockMvc.perform(MockMvcRequestBuilders.delete("/api/tasks").contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
 						.content(json))
@@ -131,8 +151,9 @@ class TaskControllerTest {
 		assertEquals("Task is deleted",result);
 	}
 
+	@WithMockUser(roles="USER")
 	@Test
-	@Order(4)
+	@Order(5)
 	public void testGetAllPagedAndSorted() throws Exception{
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/tasks/allPagAndSort")
