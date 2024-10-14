@@ -97,5 +97,5 @@ jobs:
 
   # 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag taskManager:$(date +%s)
+      run: docker build . --file Dockerfile --tag taskmanager:$(date +%s)
 
