@@ -95,6 +95,9 @@ jobs:
         USERNAME: ${{ github.actor }}
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: List files in the repository
+      run: |
+        ls ${{ github.workspace }}
   # 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag taskmanager:$(date +%s)
