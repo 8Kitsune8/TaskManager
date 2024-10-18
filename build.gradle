@@ -48,6 +48,12 @@ dependencies {
 
 }
 publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+			// You can add more details about the artifact if needed
+		}
+	}
 	repositories {
 		maven {
 			name = "GitHubPackages"
