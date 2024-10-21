@@ -1,10 +1,12 @@
 package com.minitask.taskmanager.controller;
 
+import com.minitask.taskmanager.config.AppConfig;
 import com.minitask.taskmanager.exception.BadTaskFormatException;
 import com.minitask.taskmanager.model.Task;
 import com.minitask.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,12 +19,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Log4j2
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
 
     @Autowired
     TaskService taskService;
+
+    @Autowired
+    private AppConfig config;
 
     @GetMapping("/all")
     public List<Task> getAllTasks() {
@@ -54,6 +60,7 @@ public class TaskController {
     @PutMapping
     public ResponseEntity<Task> updateTask(@Valid @RequestBody Task task, Errors errors){
         if (errors.hasErrors()) {
+            log.info(config.getNotEmptyMessage());
             return new ResponseEntity(new BadTaskFormatException(errors), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(taskService.updateOrInsertTask(task), HttpStatus.ACCEPTED);

@@ -1,13 +1,24 @@
 package com.minitask.taskmanager.config;
 
-import lombok.Getter;
+import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-@ConfigurationProperties(prefix = "jakarta")
+
+@Configuration
+//@ConfigurationProperties(prefix = "jakarta")
+//@Setter //needs to be together if using @ConfigurationProperties
 @Getter
 public class AppConfig {
 
-    @Value("${validation.notEmptyMessage}")
+    @Value("${jakarta.validation.notEmptyMessage}")
     private String notEmptyMessage;
+
+  /*  private ValidationProps validation;
+
+    @Getter
+    @Setter
+    public static class ValidationProps {
+        private String notEmptyMessage;
+    }*/
 }
