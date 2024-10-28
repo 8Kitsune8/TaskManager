@@ -58,7 +58,7 @@ public class TaskController {
         return new ResponseEntity<>(taskService.updateOrInsertTask(task), HttpStatus.CREATED);
     }
     @PutMapping
-    public ResponseEntity<Task> updateTask(@Valid @RequestBody Task task, Errors errors){
+    public ResponseEntity<Task> updateOrCreateTask(@Valid @RequestBody Task task, Errors errors){
         if (errors.hasErrors()) {
             log.info(config.getNotEmptyMessage());
             return new ResponseEntity(new BadTaskFormatException(errors), HttpStatus.BAD_REQUEST);

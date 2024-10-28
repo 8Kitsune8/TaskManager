@@ -89,7 +89,7 @@ class TaskControllerTest {
 
 	@WithMockUser(roles="USER")
 	@Test
-	public void testUpdateTaskNoDescriptionReturnsException() throws Exception {
+	public void testUpdateOrCreateTaskNoDescriptionReturnsException() throws Exception {
 		Task updatedTask = new Task();
 		updatedTask.setId(4L);
 		updatedTask.setTitle("Study Kanji");
@@ -107,7 +107,7 @@ class TaskControllerTest {
 
 	@WithMockUser(roles="USER")
 	@Test
-	public void testUpdateTaskOK() throws Exception {
+	public void testUpdateOrCreateTaskOK() throws Exception {
 
 		Task updatedTask = new Task();
 		updatedTask.setId(1L);
