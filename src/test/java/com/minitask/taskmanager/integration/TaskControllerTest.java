@@ -138,9 +138,20 @@ class TaskControllerTest {
 				.andReturn();
 	}
 
-	@WithMockUser(username="ADMIN", roles="ADMIN")
+	@WithMockUser(username="USER", roles="USER")
 	@Test
 	@Order(4)
+	public void testDeteleTaskWithWrongRoleFails() throws Exception{
+		String json = mapper.writeValueAsString(task);
+		mockMvc.perform(MockMvcRequestBuilders.delete("/api/tasks").contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+						.content(json))
+				.andExpect(status().isForbidden())
+				.andReturn();
+	}
+
+	@WithMockUser(username="ADMIN", roles="ADMIN")
+	@Test
+	@Order(5)
 	public void testDeteleTaskWithRoleOK() throws Exception{
 		String json = mapper.writeValueAsString(task);
 		MvcResult requestResult = mockMvc.perform(MockMvcRequestBuilders.delete("/api/tasks").contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
@@ -154,7 +165,7 @@ class TaskControllerTest {
 
 	@WithMockUser(roles="USER")
 	@Test
-	@Order(5)
+	@Order(6)
 	public void testGetAllPagedAndSorted() throws Exception{
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/tasks/allPagAndSort")
